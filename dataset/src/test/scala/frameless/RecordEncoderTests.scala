@@ -30,7 +30,7 @@ object RecordEncoderTests {
 
 class RecordEncoderTests extends TypedDatasetSuite with Matchers {
   test("Unable to encode products made from units only") {
-    illTyped("""TypedEncoder[UnitsOnly]""")
+    illTyped("TypedEncoder[UnitsOnly]")
   }
 
   test("Dropping fields") {
@@ -105,12 +105,30 @@ class RecordEncoderTests extends TypedDatasetSuite with Matchers {
   test("Case class with value class field") {
     import RecordEncoderTests._
 
+    illTyped(
+      // As `Person` is not a Value class
+      "val _: RecordFieldEncoder[Person] = RecordFieldEncoder.valueClass")
+
+    val fieldEncoder: RecordFieldEncoder[Name] = RecordFieldEncoder.valueClass
+
+    fieldEncoder.encoder.catalystRepr shouldBe StringType
+    fieldEncoder.encoder.jvmRepr shouldBe StringType
+
+    // Encode as a Person field
     val encoder = TypedEncoder[Person]
 
     encoder.jvmRepr shouldBe ObjectType(classOf[Person])
 
-    encoder.catalystRepr shouldBe StructType(Seq(
+    val expectedPersonStructType = StructType(Seq(
       StructField("name", StringType, false),
       StructField("age", IntegerType, false)))
+
+    encoder.catalystRepr shouldBe expectedPersonStructType
+
+    val rdd = sc.parallelize(Seq(Row.fromTuple("Foo" -> 2)))
+    val df = session.createDataFrame(rdd, expectedPersonStructType)
+    val ds = TypedDataset.createUnsafe(df)(encoder)
+
+    ds.collect.run() shouldBe Seq(Person(new Name("Foo"), 2))
   }
 }
