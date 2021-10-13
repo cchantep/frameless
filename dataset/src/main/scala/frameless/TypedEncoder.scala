@@ -52,6 +52,8 @@ object TypedEncoder {
 
     def fromCatalyst(path: Expression): Expression =
       Invoke(path, "toString", jvmRepr)
+
+    override val toString = "stringEncoder"
   }
 
   implicit val booleanEncoder: TypedEncoder[Boolean] = new TypedEncoder[Boolean] {
@@ -72,6 +74,8 @@ object TypedEncoder {
 
     def toCatalyst(path: Expression): Expression = path
     def fromCatalyst(path: Expression): Expression = path
+
+    override def toString = "intEncoder"
   }
 
   implicit val longEncoder: TypedEncoder[Long] = new TypedEncoder[Long] {

@@ -1,6 +1,6 @@
 package frameless
 
-import org.apache.spark.sql.{Row, functions => F}
+import org.apache.spark.sql.{ Row, functions => F}
 import org.apache.spark.sql.types.{
   IntegerType, LongType, ObjectType, StringType, StructField, StructType
 }
