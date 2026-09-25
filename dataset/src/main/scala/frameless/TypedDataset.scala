@@ -956,7 +956,7 @@ class TypedDataset[T] protected[frameless] (
 
     // now we need to unpack `Tuple1[A]` to `A`
 
-    TypedEncoder[A].catalystRepr match {
+    ea.catalystRepr match {
       case StructType(_) =>
         // if column is struct, we use all its fields
         val df =
